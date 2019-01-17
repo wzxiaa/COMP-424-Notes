@@ -1,0 +1,232 @@
+\documentclass[10pt, a4paper, oneside]{book}
+
+\usepackage{titlesec}
+\usepackage{lipsum}
+\usepackage{color}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage[table,xcdraw]{xcolor}
+
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=1.5cm,bottom=1.5cm}
+
+\usepackage{array}
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=black,  %choose some color if you want links to stand out
+}
+
+\usepackage{array}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\usepackage[T1]{fontenc}
+\usepackage{titlesec, blindtext, color}
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+\titlespacing{\chapter}{0pt}{\parskip}{*0.5}
+
+\newtheoremstyle{theoremdd}% name of the style to be used
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {\itshape}% name of font to use in the body of the theorem
+  {10pt}% measure of space to indent
+  {\bfseries}% name of head font
+  {. ---}% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {}
+
+\theoremstyle{theoremdd}
+\newtheorem*{definition}{Definition}
+
+\newtheorem{theorem}{Theorem}[chapter]
+
+\newtheorem{corollary}{Corollary}
+
+\newtheorem{example}{Example}[chapter]
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\usepackage[listings]{tcolorbox}
+\tcbuselibrary{listings,theorems}
+
+\newtcbtheorem[number within=section]{mytheo}{Theorem}%
+{colback=white,colframe=black!,fonttitle=\bfseries}{th}
+
+\usepackage[ruled,vlined,algosection]{algorithm2e}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\newtheorem{lemma}{Lemma}[section]
+
+\author{Wenzong Xia}
+\title{COMP 424 Artificial Intelligence - Winter 2019}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\part{Introduction}
+\section*{Biological Intelligence}
+
+What is biological intelligence? A mix of general-purpose and special-purpose algorithms. \textbf{General purpose:} Memory formation, updating, retrieval. Learning new tasks. \textbf{Special-purpose:} Recognizing visual patterns. Recognizing sounds. Learning language. All are integrated seamlessly.
+
+\section*{Definition of AI}
+\textbf{Working definition of AI:} Developing models and algorithms that can produce rational behaviors in response to incoming stimulus and information.
+\begin{figure}[h!]
+\includegraphics[width=100mm]{./img/AI_def.png}
+\end{figure}
+
+\section*{Goals of AI}
+The general goals of AI: 
+\begin{center}
+\renewcommand{\arraystretch}{3}
+\begin{tabular}{ c  c  c }
+Thinking Humanly \cellcolor{yellow} & Thinking Rationally \cellcolor{yellow} & $\longleftarrow $ Hard to keep track of the progress \\ 
+Acting Humanly   & Acting Rationally \cellcolor{green} & \\ 
+                 & \put(50, 10){\vector(0,1){20}} The focus of the course & \\
+\end{tabular}
+\end{center}
+
+\subsection*{Acting Rationally}
+\begin{itemize}
+\item Rational behavior = doing the 'right' thing.
+\item Doing what is expected to \textbf{maximize goal achievement}, given the \textbf{available information} and \textbf{available resources}.
+\begin{itemize}
+\item Does not necessarily require thinking (e.g. blinking reflex).
+\item But in many cases, thinking serves rational behavior.
+\item This is the flavor of AI we will focus on.
+\end{itemize}
+\end{itemize}
+
+\subsection*{Rational Agents}
+\begin{itemize}
+\item This course is about designing \textbf{rational agents}.
+\begin{itemize}
+\item An agent is an entity that perceives and acts.
+\item Goal: Learn a function mapping percept histories to actions: $f: p^{h} \rightarrow A$
+\end{itemize}
+\item A rational agent implements this function such as to maximize performance.
+\item \textbf{Caveat}: resources constraints (time, space, energy, bandwidth,...) which make perfect rationality unachievable.
+\item \textbf{Objective}: Find best function for given information and resources.
+\end{itemize}
+
+\part{Basic Tools}
+\chapter{Search}
+\section{Uninformed Search}
+Search is at the heart of all AI systems. Typical setup of an AI task includes:
+\begin{itemize}
+\item \textbf{Knowledge}: 
+\begin{itemize}
+\item Formal representation of the problem to be solved.
+\item Includes definitions of state, goal, available actions.
+\item Other factual or probabilistic knowledge about the problem.
+\end{itemize}
+\end{itemize}
+\begin{itemize}
+\item \textbf{Search}:
+\begin{itemize}
+\item Process of finding a solution (or possibly, the \textbf{best} solution).
+\end{itemize}
+\end{itemize}
+
+\subsection{Defining a Search Problem}
+Before we solve a problem, we need to formulate the problem into a search problem:
+\begin{itemize}
+\item \textbf{State space $S$}: all possible configurations of the domain.
+\item \textbf{Initial state $s_{0} \in S$}: the start state. 
+\item \textbf{Goal states $G \subset S$}: the set of end states.
+\item \textbf{Operators $A$}: the actions available (often defined in terms of mapping from state to successor state).
+\item \textbf{Path}: a sequence of states and operators.
+\item \textbf{Path cost $C$}: a number associated with any path.
+\item \textbf{Solution}: a path from $s_{0}$ to $s_{g} \in G$.
+\item \textbf{Optimal solution}: a path with minimum cost.
+\end{itemize}
+
+\subsection{Basic Assumptions}
+For next few lectures, simplifying assumptions for now. Later, we will consider search in other settings.
+\begin{itemize}
+\item \textbf{Static:} The environment will not change in the course of the search. vs \textbf{dynamic} environment.
+\item \textbf{Observable:} The agent always know the current state.  vs \textbf{unobservable} environment. 
+\item \textbf{Discrete:} At any given states, there are only finite many actions to choose from. vs \textbf{continuous} states.
+\item \textbf{Deterministic:} Each action has exactly one outcome. vs \textbf{stochastic} environment.
+\end{itemize}
+Under these assumptions, the solution to any problem is a fixed sequence of actions.
+
+\subsubsection*{Eight Puzzle Example}
+
+\subsection{Search Graph vs Search Tree}
+The process of looking for a sequence of actions that reach the goal is called \textbf{search}. A search algorithm takes a problem as input and returns a solution in the form of an action sequence. Once a solution is found, the actions it recommended can be carried out and thus in a execution phase.
+\subsubsection*{Search Graph}
+Search graph can visualize the state space search in terms of a graph. Graph defined by a set of vertices and a set of edges connecting the vertices. Nodes correspond to states in $S$. Edges correspond to operators. 
+\subsubsection*{Search Tree}
+Search tree represents the exploration paths in a search procedure. Nodes represent partial solutions, including a state in $S$. Edges correspond to operators. 
+
+\subsection{Data Structure for Search Tree}
+Defining a search tree node: 
+\begin{itemize}
+\item Each node contains a state id (from states in the graph).
+\item Nodes also contain additional information: 
+\begin{itemize}
+\item The \underline{parent state} and the \underline{operator} used to generate it.
+\item \underline{Cost} of the path \underline{so far}.
+\item \underline{Depth} of the node.
+\end{itemize}
+\end{itemize}
+Expanding a search tree node: 
+\begin{itemize}
+\item Applying \underline{all} legal operators to the state.
+\item Generating nodes for all the corresponding successor states.
+\end{itemize}
+
+\subsection{Generic Search Algorithm}
+\begin{algorithm}[H]
+\SetAlgoLined
+\caption{Generic Search Algorithm}
+\KwResult{A solution/Failure}
+\textbf{Initialize} the search tree using the initial state of the problem\;
+\textbf{Repeat} \\
+\uIf{No candidate nodes can be expanded}{return \textcolor{red}{Failure}}
+Choose a node for expansion, according to some search strategy\;
+\eIf{The node contains a \textcolor{blue}{goal state}}{return the corresponding path}{Expand the node by applying each applicable \textcolor{blue}{operator}, generating the \textcolor{blue}{successor state} and adding the resulting node to the tree}
+\end{algorithm}
+
+
+
+\part{Logical Representations}
+\chapter{Game Playing}
+\chapter{Logical Reasoning}
+\chapter{Classical Planning}
+
+\part{Probabilistic Representations}
+\chapter{Probabilistic Reasoning}
+\chapter{Learning Probabilistic Models}
+
+\part{Utility Theory}
+\chapter{Reasoning With Utilities}
+\chapter{Sequential Reasoning And Decision-making}
+\chapter{Learning Complex Sequential Decisions}
+\chapter{Applications}
+
+
+
+
+
+
+
+
+
+\end{document}
